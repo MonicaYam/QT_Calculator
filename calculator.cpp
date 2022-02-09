@@ -25,7 +25,7 @@ Calculator::Calculator(QWidget *parent):
         connect(numberButtons[i], SIGNAL(released()), this, SLOT(numberReleased()));
     }
 
-    // Connect signals and slots for math buttons
+    // Connect signals and slots
     connect(ui->Button_Add, SIGNAL(released()), this,
             SLOT(mathButtonReleased()));
     connect(ui->Button_Subtract, SIGNAL(released()), this,
@@ -34,20 +34,12 @@ Calculator::Calculator(QWidget *parent):
             SLOT(mathButtonReleased()));
     connect(ui->Button_Divide, SIGNAL(released()), this,
             SLOT(mathButtonReleased()));
-
-    // Connect equals button
     connect(ui->Button_Equals, SIGNAL(released()), this,
             SLOT(equalsButtonReleased()));
-
-    // Connect Pow button
     connect(ui->Button_Pow, SIGNAL(released()), this,
             SLOT(powButtonReleased()));
-
-    // Connect Clear button
     connect(ui->Button_Clear, SIGNAL(released()), this,
             SLOT(clearButtonReleased()));
-
-    // Connect Clear button
     connect(ui->Button_DecimalPoint, SIGNAL(released()), this,
             SLOT(decimalPointButtonReleased()));
 }
@@ -60,6 +52,7 @@ Calculator::~Calculator()
 
 //SLOT functions ----
 
+//user released number button
 void Calculator::numberReleased(){
     if(clearTrigger){
         clear();
@@ -73,13 +66,13 @@ void Calculator::numberReleased(){
     QString displayVal = ui->Display->text();
     QPushButton *button = (QPushButton *)sender();
     QString buttonVal = button->text();
-    QString newVal = displayVal + buttonVal;
-    ui->Display->setText(QString::number(newVal.toDouble(), 'g', 16));
+    QString newNum = displayVal + buttonVal;
+    ui->Display->setText(QString::number(newNum.toDouble(), 'g', 16));
     ui->History->setText(historyVal + buttonVal);
 
 }
 
-
+//user released +,-,/,* button
 void Calculator::mathButtonReleased(){
     if(ui->History->text().count("=")==1){
         clearHistory();
@@ -95,7 +88,7 @@ void Calculator::mathButtonReleased(){
     //get a pointer of pressed button
     QPushButton *button = (QPushButton *)sender();
 
-    // Get math symbol on the button
+    // get symbol value from the button
     QString buttonVal = button->text();
 
     char trigger;
@@ -114,7 +107,7 @@ void Calculator::mathButtonReleased(){
         trigger='/';
     }
 
-    // Store current value in Display
+    // put current display value into result
     result =  ui->Display->text().toDouble();
     //set text on hitory
     SetTextToHistory(ui->History->text() + trigger);
@@ -123,12 +116,15 @@ void Calculator::mathButtonReleased(){
 
 }
 
+//user released = button
 void Calculator::equalsButtonReleased(){
     QString historyVal = ui->History->text();
+    
+    //if user already pressed =, then do nothing
     if(historyVal.right(1)!="="){
         double answer = 0.0;
 
-        // Get value in display
+        // get display value
         double displayVal = ui->Display->text().toDouble();
 
         if(addTrigger){
@@ -155,21 +151,30 @@ void Calculator::equalsButtonReleased(){
     }
 }
 
+//user released x2 button
 void Calculator::powButtonReleased(){
+    //get display value
     double num = ui->Display->text().toDouble();
+    
+    //calculate pow
     double powNumber = pow(num, 2.0);
+    
+    //set text
     ui->History->setText("pow("+QString::number(num)+")");
     ui->Display->setText(QString::number(powNumber));
 
 }
 
+//user released c button
 void Calculator::clearButtonReleased(){
+    //clear everything
     clear();
     result=0;
 }
 
-
+//user released . button
 void Calculator::decimalPointButtonReleased(){
+    //set text
     ui->History->setText(ui->History->text()+'.');
     ui->Display->setText(ui->Display->text()+'.');
 }
@@ -179,7 +184,9 @@ void Calculator::decimalPointButtonReleased(){
 
 void Calculator::calculate(){
     double answer = 0.0;
+    //get display value
     double displayVal = ui->Display->text().toDouble();
+    
     if(addTrigger){
         answer = result + displayVal;
         addTrigger=false;
@@ -193,7 +200,10 @@ void Calculator::calculate(){
         answer = result * displayVal;
         multiplyTrigger=false;
     }
+    
+    //clear display and history
     clear();
+    //set answer as a text on history and display
     ui->History->setText(QString::number(answer));
     ui->Display->setText(QString::number(answer));
 }
